@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+  # Single PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: postgres-foodybuddy-prod
+    environment:
+      POSTGRES_DB: foodybuddy
+      POSTGRES_USER: foodybuddy_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-foodybuddy_password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql
+    networks:
+      - foodybuddy-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodybuddy_user -d foodybuddy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  foodybuddy-web:
+    build: 
+      context: ./foodybuddy-web
+      dockerfile: Dockerfile
+    container_name: foodybuddy-web-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      foodybuddy-gateway:
+        condition: service_healthy
+    networks:
+      - foodybuddy-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  foodybuddy-gateway:
+    build: 
+      context: ./foodybuddy-gateway
+      dockerfile: Dockerfile
+    container_name: foodybuddy-gateway-prod
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].ID=orders-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].URI=http://foodybuddy-orders:8081
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].PREDICATES[0]=Path=/api/orders/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].ID=payments-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].URI=http://foodybuddy-payments:8082
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].PREDICATES[0]=Path=/api/payments/**
+    depends_on:
+      postgres:
+        condition: service_healthy
+      foodybuddy-orders:
+        condition: service_healthy
+      foodybuddy-payments:
+        condition: service_healthy
+    networks:
+      - foodybuddy-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  foodybuddy-orders:
+    build: 
+      context: ./foodybuddy-orders
+      dockerfile: Dockerfile
+    container_name: foodybuddy-orders-prod
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=orders
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-foodybuddy_password}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - foodybuddy-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  foodybuddy-payments:
+    build: 
+      context: ./foodybuddy-payments
+      dockerfile: Dockerfile
+    container_name: foodybuddy-payments-prod
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=payments
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-foodybuddy_password}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - foodybuddy-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+networks:
+  foodybuddy-network:
+    driver: bridge
+    name: foodybuddy-network-prod
+
+volumes:
+  postgres-data:
+    name: foodybuddy-postgres-single-db-prod

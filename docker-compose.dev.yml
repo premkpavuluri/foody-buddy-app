@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # Single PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: postgres-foodybuddy-dev
+    environment:
+      POSTGRES_DB: foodybuddy
+      POSTGRES_USER: foodybuddy_user
+      POSTGRES_PASSWORD: foodybuddy_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql
+    networks:
+      - foodybuddy-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodybuddy_user -d foodybuddy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  foodybuddy-web:
+    build: 
+      context: ./foodybuddy-web
+      dockerfile: Dockerfile.dev
+    container_name: foodybuddy-web-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    volumes:
+      - ./foodybuddy-web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - foodybuddy-gateway
+    networks:
+      - foodybuddy-network
+    restart: unless-stopped
+    command: ["yarn", "dev"]
+
+  foodybuddy-gateway:
+    build: 
+      context: ./foodybuddy-gateway
+      dockerfile: Dockerfile.dev
+    container_name: foodybuddy-gateway-dev
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].ID=orders-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].URI=http://foodybuddy-orders:8081
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].PREDICATES[0]=Path=/api/orders/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].ID=payments-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].URI=http://foodybuddy-payments:8082
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].PREDICATES[0]=Path=/api/payments/**
+    volumes:
+      - ./foodybuddy-gateway:/app
+      - /app/build
+    depends_on:
+      - postgres
+      - foodybuddy-orders
+      - foodybuddy-payments
+    networks:
+      - foodybuddy-network
+    restart: unless-stopped
+    command: ["./gradlew", "bootRun"]
+
+  foodybuddy-orders:
+    build: 
+      context: ./foodybuddy-orders
+      dockerfile: Dockerfile.dev
+    container_name: foodybuddy-orders-dev
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=orders
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
+      - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
+    depends_on:
+      - postgres
+    volumes:
+      - ./foodybuddy-orders:/app
+      - /app/build
+    networks:
+      - foodybuddy-network
+    restart: unless-stopped
+    command: ["./gradlew", "bootRun"]
+
+  foodybuddy-payments:
+    build: 
+      context: ./foodybuddy-payments
+      dockerfile: Dockerfile.dev
+    container_name: foodybuddy-payments-dev
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=payments
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
+      - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
+    depends_on:
+      - postgres
+    volumes:
+      - ./foodybuddy-payments:/app
+      - /app/build
+    networks:
+      - foodybuddy-network
+    restart: unless-stopped
+    command: ["./gradlew", "bootRun"]
+
+networks:
+  foodybuddy-network:
+    driver: bridge
+    name: foodybuddy-network-dev
+
+volumes:
+  postgres-data:
+    name: foodybuddy-postgres-single-db-dev
