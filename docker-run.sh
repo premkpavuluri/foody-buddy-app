@@ -37,6 +37,30 @@ check_docker() {
     fi
 }
 
+# Function to check if images exist
+check_images_exist() {
+    local compose_file=$1
+    local missing_images=()
+    
+    # Get all service names from compose file
+    local services=$(docker-compose -f $compose_file config --services 2>/dev/null)
+    
+    for service in $services; do
+        # Skip postgres as it uses a public image
+        if [ "$service" = "postgres" ]; then
+            continue
+        fi
+        
+        # Check for the actual pattern used: foody-buddy-app-{service}:latest
+        local actual_image_name="foody-buddy-app-${service}:latest"
+        if ! docker image inspect "$actual_image_name" > /dev/null 2>&1; then
+            missing_images+=("$service")
+        fi
+    done
+    
+    echo "${missing_images[@]}"
+}
+
 # Function to show usage
 show_usage() {
     echo "🍕 FoodyBuddy Docker Services Runner"
@@ -46,7 +70,7 @@ show_usage() {
     echo "  Supports multiple environments with different configurations."
     echo ""
     echo "USAGE:"
-    echo "  $0 [ENVIRONMENT] [COMMAND]"
+    echo "  $0 [ENVIRONMENT] [COMMAND] [OPTIONS]"
     echo ""
     echo "ENVIRONMENTS:"
     echo "  dev     - Development environment with hot reloading"
@@ -62,13 +86,18 @@ show_usage() {
     echo "  clean   - Clean up containers, images, and volumes"
     echo "  -h, --help - Show this help message"
     echo ""
+    echo "OPTIONS:"
+    echo "  --build - Build images when starting services"
+    echo "           (Images are automatically built if missing)"
+    echo ""
     echo "EXAMPLES:"
-    echo "  $0 dev up      # Start development environment"
-    echo "  $0 prod build  # Build production images"
-    echo "  $0 down        # Stop all services"
-    echo "  $0 dev logs    # View development logs"
-    echo "  $0 prod status # Check production status"
-    echo "  $0 clean       # Clean up everything"
+    echo "  $0 dev up         # Start development environment (build if needed)"
+    echo "  $0 dev up --build # Build and start development environment"
+    echo "  $0 prod build     # Build production images"
+    echo "  $0 down           # Stop all services"
+    echo "  $0 dev logs       # View development logs"
+    echo "  $0 prod status    # Check production status"
+    echo "  $0 clean          # Clean up everything"
     echo ""
     echo "SERVICES:"
     echo "  📦 Orders Service    - Port 8081 (Spring Boot)"
@@ -113,6 +142,7 @@ show_usage() {
 main() {
     local environment=${1:-"default"}
     local command=${2:-"up"}
+    local force_build=false
     
     # Handle help commands
     if [[ "$environment" == "-h" || "$environment" == "--help" ]]; then
@@ -124,6 +154,14 @@ main() {
         show_usage
         exit 0
     fi
+    
+    # Check for --build flag in any position
+    for arg in "$@"; do
+        if [[ "$arg" == "--build" ]]; then
+            force_build=true
+            break
+        fi
+    done
     
     # Validate environment
     case $environment in
@@ -165,7 +203,25 @@ main() {
     case $command in
         up)
             print_status "🍕 Starting FoodyBuddy services with Docker..."
-            docker-compose -f $compose_file up --build -d
+            
+            # Check if images exist or if --build flag is provided
+            if [ "$force_build" = true ]; then
+                print_status "Building all images..."
+                docker-compose -f $compose_file build
+            else
+                # Check for missing images
+                local missing_images=($(check_images_exist $compose_file))
+                if [ ${#missing_images[@]} -gt 0 ]; then
+                    print_warning "Missing images detected: ${missing_images[*]}"
+                    print_status "Building missing images..."
+                    docker-compose -f $compose_file build
+                else
+                    print_status "All images found, starting services..."
+                fi
+            fi
+            
+            # Start services
+            docker-compose -f $compose_file up -d
             print_success "All services started!"
             echo ""
             echo "Services available at:"
