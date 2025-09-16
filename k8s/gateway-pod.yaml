@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
   - name: foodybuddy-gateway
-    image: foody-buddy-app-foodybuddy-gateway:latest
+    image: foodybuddy.prod.gateway:latest
     imagePullPolicy: IfNotPresent
     ports:
     - containerPort: 8080

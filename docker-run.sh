@@ -40,6 +40,7 @@ check_docker() {
 # Function to check if images exist
 check_images_exist() {
     local compose_file=$1
+    local environment=$2
     local missing_images=()
     
     # Get all service names from compose file
@@ -51,8 +52,28 @@ check_images_exist() {
             continue
         fi
         
-        # Check for the actual pattern used: foody-buddy-app-{service}:latest
-        local actual_image_name="foody-buddy-app-${service}:latest"
+        # Map service names to our naming convention
+        local service_name=""
+        case $service in
+            foodybuddy-web)
+                service_name="web"
+                ;;
+            foodybuddy-gateway)
+                service_name="gateway"
+                ;;
+            foodybuddy-orders)
+                service_name="orders"
+                ;;
+            foodybuddy-payments)
+                service_name="payments"
+                ;;
+            *)
+                service_name="$service"
+                ;;
+        esac
+        
+        # Check for the new pattern: foodybuddy.{env}.{service}:latest
+        local actual_image_name="foodybuddy.${environment}.${service_name}:latest"
         if ! docker image inspect "$actual_image_name" > /dev/null 2>&1; then
             missing_images+=("$service")
         fi
@@ -210,7 +231,7 @@ main() {
                 docker-compose -f $compose_file build
             else
                 # Check for missing images
-                local missing_images=($(check_images_exist $compose_file))
+                local missing_images=($(check_images_exist $compose_file $environment))
                 if [ ${#missing_images[@]} -gt 0 ]; then
                     print_warning "Missing images detected: ${missing_images[*]}"
                     print_status "Building missing images..."

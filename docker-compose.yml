@@ -27,6 +27,7 @@ services:
     build: 
       context: ./foodybuddy-web
       dockerfile: Dockerfile
+    image: foodybuddy.prod.web:latest
     container_name: foodybuddy-web
     ports:
       - "3000:3000"
@@ -50,6 +51,7 @@ services:
     build: 
       context: ./foodybuddy-gateway
       dockerfile: Dockerfile
+    image: foodybuddy.prod.gateway:latest
     container_name: foodybuddy-gateway
     ports:
       - "8080:8080"
@@ -82,6 +84,7 @@ services:
     build: 
       context: ./foodybuddy-orders
       dockerfile: Dockerfile
+    image: foodybuddy.prod.orders:latest
     container_name: foodybuddy-orders
     ports:
       - "8081:8081"
@@ -108,6 +111,7 @@ services:
     build: 
       context: ./foodybuddy-payments
       dockerfile: Dockerfile
+    image: foodybuddy.prod.payments:latest
     container_name: foodybuddy-payments
     ports:
       - "8082:8082"
