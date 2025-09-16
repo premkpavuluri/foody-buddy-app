@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: foodybuddy-orders
+  labels:
+    app: foodybuddy-orders
+    component: backend
+spec:
+  containers:
+  - name: foodybuddy-orders
+    image: foodybuddy.prod.orders:latest
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 8081
+      protocol: TCP
+    env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: "docker"
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"

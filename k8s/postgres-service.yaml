@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-db-service
+  labels:
+    app: postgres-database
+    component: database
+spec:
+  clusterIP: None  # Headless service
+  selector:
+    app: postgres-database
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
