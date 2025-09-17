@@ -16,6 +16,9 @@ fabric.properties
 # VS Code
 .vscode/
 
+# Cursor AI
+.cursor/
+
 # Mac
 .DS_Store
 
