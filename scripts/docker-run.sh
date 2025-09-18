@@ -210,7 +210,7 @@ main() {
     check_docker
     
     # Set compose file based on environment
-    local compose_file="docker-compose.yml"
+    local compose_file="docker-compose.prod.yml"
     if [ "$environment" = "dev" ]; then
         compose_file="docker-compose.dev.yml"
     elif [ "$environment" = "prod" ]; then

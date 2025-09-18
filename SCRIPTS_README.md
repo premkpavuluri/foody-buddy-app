@@ -18,7 +18,7 @@ This directory contains scripts to run all FoodyBuddy microservices locally usin
 
 **Usage:**
 ```bash
-./run-services.sh
+./scripts/run-services.sh
 ```
 
 **Services started:**
@@ -38,7 +38,7 @@ This directory contains scripts to run all FoodyBuddy microservices locally usin
 
 **Usage:**
 ```bash
-./dev-local.sh
+./scripts/dev-local.sh
 ```
 
 
@@ -162,7 +162,7 @@ lsof -ti :8080 :8081 :8082 :3000 | xargs kill -9
 
 1. **Start all services:**
    ```bash
-   ./run-services.sh
+   ./scripts/run-services.sh
    ```
 
 2. **Access the application:**

@@ -145,7 +145,7 @@ GRANT ALL PRIVILEGES ON SCHEMA payments TO foodybuddy_user;
 
 ```bash
 # Start development environment
-./start-postgres.sh start dev
+./scripts/start-postgres.sh start dev
 
 # Or using docker-compose directly
 docker-compose -f docker-compose.dev.yml up --build
@@ -155,7 +155,7 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ```bash
 # Start production environment
-./start-postgres.sh start prod
+./scripts/start-postgres.sh start prod
 
 # Or using docker-compose directly
 docker-compose -f docker-compose.prod.yml up --build -d
@@ -165,7 +165,7 @@ docker-compose -f docker-compose.prod.yml up --build -d
 
 ```bash
 # Start local environment
-./start-postgres.sh start local
+./scripts/start-postgres.sh start local
 
 # Or using docker-compose directly
 docker-compose up --build -d
@@ -246,29 +246,29 @@ JOIN payments.transactions p ON o.order_id = p.order_id;
 
 ```bash
 # Show help
-./start-postgres.sh help
+./scripts/start-postgres.sh help
 
 # Start development environment
-./start-postgres.sh start dev
+./scripts/start-postgres.sh start dev
 
 # Start production environment
-./start-postgres.sh start prod
+./scripts/start-postgres.sh start prod
 
 # Show application status
-./start-postgres.sh status
+./scripts/start-postgres.sh status
 
 # Show logs for all services
-./start-postgres.sh logs
+./scripts/start-postgres.sh logs
 
 # Show logs for specific service
-./start-postgres.sh logs gateway
-./start-postgres.sh logs postgres
+./scripts/start-postgres.sh logs gateway
+./scripts/start-postgres.sh logs postgres
 
 # Stop application
-./start-postgres.sh stop
+./scripts/start-postgres.sh stop
 
 # Clean up everything
-./start-postgres.sh cleanup
+./scripts/start-postgres.sh cleanup
 ```
 
 ## Benefits of Single Database Approach
@@ -333,13 +333,13 @@ docker-compose ps
 
 ```bash
 # Database logs
-./start-postgres.sh logs postgres
+./scripts/start-postgres.sh logs postgres
 
 # All service logs
-./start-postgres.sh logs
+./scripts/start-postgres.sh logs
 
 # Specific service logs
-./start-postgres.sh logs gateway
+./scripts/start-postgres.sh logs gateway
 ```
 
 ## Data Persistence
@@ -376,7 +376,7 @@ docker exec -i postgres-foodybuddy psql -U foodybuddy_user -d foodybuddy < gatew
 
 For issues or questions:
 
-1. Check the logs: `./start-postgres.sh logs`
+1. Check the logs: `./scripts/start-postgres.sh logs`
 2. Verify database health: `docker exec postgres-foodybuddy pg_isready`
 3. Check schema existence: `docker exec postgres-foodybuddy psql -U foodybuddy_user -d foodybuddy -c "\dn"`
 4. Review this documentation for common solutions

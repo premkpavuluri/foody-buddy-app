@@ -7,22 +7,22 @@ This guide covers running the FoodyBuddy microservices using Docker and Docker C
 ### Using the Docker Script (Recommended)
 ```bash
 # Start all services (default environment)
-./docker-run.sh
+./scripts/docker-run.sh
 
 # Start development environment with hot reloading
-./docker-run.sh dev up
+./scripts/docker-run.sh dev up
 
 # Start production environment
-./docker-run.sh prod up
+./scripts/docker-run.sh prod up
 
 # Stop all services
-./docker-run.sh down
+./scripts/docker-run.sh down
 
 # View logs
-./docker-run.sh logs
+./scripts/docker-run.sh logs
 
 # Check service status
-./docker-run.sh status
+./scripts/docker-run.sh status
 ```
 
 ### Using Docker Compose Directly
@@ -41,9 +41,8 @@ docker-compose -f docker-compose.prod.yml up --build
 
 ```
 foody-buddy-app/
-├── docker-compose.yml          # Default environment
-├── docker-compose.dev.yml      # Development environment
 ├── docker-compose.prod.yml     # Production environment
+├── docker-compose.dev.yml      # Development environment
 ├── docker-run.sh              # Docker management script
 ├── foodybuddy-gateway/
 │   ├── Dockerfile             # Production image
@@ -61,7 +60,7 @@ foody-buddy-app/
 
 ## 🏗️ Environments
 
-### Default Environment (`docker-compose.yml`)
+### Production Environment (`docker-compose.prod.yml`)
 - **Purpose**: Standard environment for testing and development
 - **Features**: 
   - Multi-stage builds for optimized images
@@ -144,7 +143,7 @@ The `docker-run.sh` script provides easy management of Docker services:
 
 ### Usage
 ```bash
-./docker-run.sh [ENVIRONMENT] [COMMAND]
+./scripts/docker-run.sh [ENVIRONMENT] [COMMAND]
 ```
 
 ### Environments
@@ -163,19 +162,19 @@ The `docker-run.sh` script provides easy management of Docker services:
 ### Examples
 ```bash
 # Start development environment
-./docker-run.sh dev up
+./scripts/docker-run.sh dev up
 
 # Build production images
-./docker-run.sh prod build
+./scripts/docker-run.sh prod build
 
 # View logs
-./docker-run.sh logs
+./scripts/docker-run.sh logs
 
 # Stop all services
-./docker-run.sh down
+./scripts/docker-run.sh down
 
 # Clean up everything
-./docker-run.sh clean
+./scripts/docker-run.sh clean
 ```
 
 ## 🔧 Dockerfile Features
@@ -313,7 +312,7 @@ docker stats
 
 ### 1. Start Development Environment
 ```bash
-./docker-run.sh dev up
+./scripts/docker-run.sh dev up
 ```
 
 ### 2. Make Code Changes
@@ -323,30 +322,30 @@ docker stats
 
 ### 3. View Logs
 ```bash
-./docker-run.sh dev logs
+./scripts/docker-run.sh dev logs
 ```
 
 ### 4. Stop Services
 ```bash
-./docker-run.sh dev down
+./scripts/docker-run.sh dev down
 ```
 
 ## 🚀 Production Deployment
 
 ### 1. Build Production Images
 ```bash
-./docker-run.sh prod build
+./scripts/docker-run.sh prod build
 ```
 
 ### 2. Start Production Services
 ```bash
-./docker-run.sh prod up
+./scripts/docker-run.sh prod up
 ```
 
 ### 3. Monitor Services
 ```bash
-./docker-run.sh prod status
-./docker-run.sh prod logs
+./scripts/docker-run.sh prod status
+./scripts/docker-run.sh prod logs
 ```
 
 ### 4. Scale Services (if needed)

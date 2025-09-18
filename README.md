@@ -103,7 +103,7 @@ CANCELLED (at any stage)
 
 2. **Or use the development script:**
    ```bash
-   ./dev.sh
+   ./scripts/dev.sh
    ```
 
 3. **Access the application:**
@@ -183,8 +183,12 @@ foody-buddy-app/
 ├── foodybuddy-gateway/      # Spring Boot Gateway/Orchestrator
 ├── foodybuddy-orders/       # Spring Boot Orders Service
 ├── foodybuddy-payments/     # Spring Boot Payments Service
-├── docker-compose.yml       # Multi-service orchestration
-└── dev.sh                   # Development script
+├── docker-compose.prod.yml  # Production orchestration
+├── docker-compose.dev.yml   # Development orchestration
+├── scripts/                 # All shell scripts
+│   ├── dev.sh              # Development script
+│   ├── docker-run.sh       # Docker management
+│   └── ...                 # Other scripts
 ```
 
 Each service directory contains:
