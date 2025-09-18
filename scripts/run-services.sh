@@ -54,6 +54,7 @@ show_help() {
     echo "  --clean        Clean up logs and stop all services"
     echo ""
     echo "SERVICES:"
+    echo "  🗄️  PostgreSQL DB     - Port 5432 (Docker)"
     echo "  📦 Orders Service    - Port 8081 (Gradle)"
     echo "  💳 Payments Service  - Port 8082 (Gradle)"
     echo "  🚪 Gateway Service   - Port 8080 (Gradle)"
@@ -81,8 +82,9 @@ show_help() {
     echo ""
     echo "TROUBLESHOOTING:"
     echo "  - If services won't start, check logs in 'logs/' directory"
-    echo "  - Ensure ports 3000, 8080, 8081, 8082 are available"
-    echo "  - Verify Java, Gradle, Node.js, and Yarn are installed"
+    echo "  - Ensure ports 3000, 8080, 8081, 8082, 5432 are available"
+    echo "  - Verify Java, Gradle, Node.js, Yarn, and Docker are installed"
+    echo "  - PostgreSQL will be started automatically in Docker"
     echo "  - Use '--clean' to reset everything"
     echo ""
     echo "Press Ctrl+C to stop all services while running"
@@ -134,6 +136,64 @@ run_service() {
     cd - > /dev/null
 }
 
+# Function to start PostgreSQL
+start_postgres() {
+    print_status "Starting PostgreSQL database..."
+    
+    # Check if PostgreSQL container is already running
+    if docker ps --format "{{.Names}}" | grep -q "postgres-foodybuddy-local"; then
+        print_success "PostgreSQL is already running"
+        return 0
+    fi
+    
+    # Check if PostgreSQL container exists but is stopped
+    if docker ps -a --format "{{.Names}}" | grep -q "postgres-foodybuddy-local"; then
+        print_status "Starting existing PostgreSQL container..."
+        docker start postgres-foodybuddy-local
+    else
+        print_status "Creating and starting PostgreSQL container..."
+        docker run -d \
+            --name postgres-foodybuddy-local \
+            -e POSTGRES_DB=foodybuddy \
+            -e POSTGRES_USER=foodybuddy_user \
+            -e POSTGRES_PASSWORD=foodybuddy_password \
+            -p 5432:5432 \
+            -v "${PROJECT_ROOT}/init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql:ro" \
+            postgres:15
+    fi
+    
+    # Wait for PostgreSQL to be ready
+    print_status "Waiting for PostgreSQL to be ready..."
+    local max_attempts=30
+    local attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if docker exec postgres-foodybuddy-local pg_isready -U foodybuddy_user -d foodybuddy >/dev/null 2>&1; then
+            print_success "PostgreSQL is ready!"
+            return 0
+        fi
+        
+        attempt=$((attempt + 1))
+        print_status "Waiting for PostgreSQL... (attempt $attempt/$max_attempts)"
+        sleep 2
+    done
+    
+    print_error "PostgreSQL failed to start within 60 seconds"
+    return 1
+}
+
+# Function to stop PostgreSQL
+stop_postgres() {
+    print_status "Stopping PostgreSQL database..."
+    
+    if docker ps --format "{{.Names}}" | grep -q "postgres-foodybuddy-local"; then
+        docker stop postgres-foodybuddy-local
+        print_success "PostgreSQL stopped"
+    else
+        print_warning "PostgreSQL container not running"
+    fi
+}
+
 # Function to cleanup on exit
 cleanup() {
     print_status "Shutting down all services..."
@@ -156,6 +216,9 @@ cleanup() {
     kill_port 8082  # Payments
     kill_port 3000  # Web
     
+    # Stop PostgreSQL
+    stop_postgres
+    
     print_success "All services stopped."
     exit 0
 }
@@ -170,6 +233,13 @@ trap cleanup SIGINT SIGTERM
 show_status() {
     print_status "Service Status:"
     echo ""
+    
+    # Check PostgreSQL status
+    if docker ps --format "{{.Names}}" | grep -q "postgres-foodybuddy-local"; then
+        print_success "postgres is running (Docker container)"
+    else
+        print_error "postgres is not running"
+    fi
     
     for service in gateway orders payments web; do
         if [ -f "${PROJECT_ROOT}/logs/${service}.pid" ]; then
@@ -186,7 +256,7 @@ show_status() {
     
     echo ""
     print_status "Port Status:"
-    for port in 3000 8080 8081 8082; do
+    for port in 5432 3000 8080 8081 8082; do
         if port_in_use $port; then
             print_success "Port $port is in use"
         else
@@ -229,6 +299,14 @@ restart_services() {
 clean_services() {
     print_status "Cleaning up logs and stopping services..."
     stop_services
+    
+    # Stop and remove PostgreSQL container
+    if docker ps -a --format "{{.Names}}" | grep -q "postgres-foodybuddy-local"; then
+        print_status "Removing PostgreSQL container..."
+        docker stop postgres-foodybuddy-local 2>/dev/null || true
+        docker rm postgres-foodybuddy-local 2>/dev/null || true
+    fi
+    
     rm -rf "${PROJECT_ROOT}/logs"
     print_success "Cleanup completed!"
 }
@@ -295,6 +373,11 @@ main() {
         exit 1
     fi
     
+    if ! command_exists docker; then
+        print_error "Docker is not installed. Please install Docker."
+        exit 1
+    fi
+    
     # Create logs directory
     mkdir -p "${PROJECT_ROOT}/logs"
     
@@ -304,6 +387,12 @@ main() {
     kill_port 8081
     kill_port 8082
     kill_port 3000
+    
+    # Start PostgreSQL database
+    if ! start_postgres; then
+        print_error "Failed to start PostgreSQL. Exiting."
+        exit 1
+    fi
     
     # Start Java services with Gradle
     print_status "Building and starting Java services..."
