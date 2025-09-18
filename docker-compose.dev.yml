@@ -56,12 +56,6 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CLOUD_GATEWAY_ROUTES[0].ID=orders-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[0].URI=http://foodybuddy-orders:8081
-      - SPRING_CLOUD_GATEWAY_ROUTES[0].PREDICATES[0]=Path=/api/orders/**
-      - SPRING_CLOUD_GATEWAY_ROUTES[1].ID=payments-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[1].URI=http://foodybuddy-payments:8082
-      - SPRING_CLOUD_GATEWAY_ROUTES[1].PREDICATES[0]=Path=/api/payments/**
     volumes:
       - ./foodybuddy-gateway:/app
       - /app/build
@@ -84,10 +78,6 @@ services:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=orders
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
-      - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
     depends_on:
       - postgres
     volumes:
@@ -108,10 +98,6 @@ services:
       - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=payments
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
-      - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
     depends_on:
       - postgres
     volumes:

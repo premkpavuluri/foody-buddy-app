@@ -94,9 +94,8 @@ show_usage() {
     echo "  $0 [ENVIRONMENT] [COMMAND] [OPTIONS]"
     echo ""
     echo "ENVIRONMENTS:"
-    echo "  dev     - Development environment with hot reloading"
+    echo "  dev     - Development environment with hot reloading (default)"
     echo "  prod    - Production environment with optimizations"
-    echo "  default - Standard environment (default)"
     echo ""
     echo "COMMANDS:"
     echo "  up      - Start all services (default)"
@@ -145,11 +144,11 @@ show_usage() {
     echo "    - Persistent data volumes"
     echo "    - Production configurations"
     echo ""
-    echo "  Default:"
-    echo "    - Standard environment"
-    echo "    - Health checks enabled"
-    echo "    - Service dependencies"
-    echo "    - Restart policies"
+    echo "  Development (dev) - Default:"
+    echo "    - Hot reloading enabled"
+    echo "    - Volume mounting for live code changes"
+    echo "    - Development Dockerfiles"
+    echo "    - Faster startup times"
     echo ""
     echo "TROUBLESHOOTING:"
     echo "  - Use 'docker-compose logs [service]' for specific service logs"
@@ -161,7 +160,7 @@ show_usage() {
 
 # Main function
 main() {
-    local environment=${1:-"default"}
+    local environment=${1:-"dev"}
     local command=${2:-"up"}
     local force_build=false
     
@@ -186,7 +185,7 @@ main() {
     
     # Validate environment
     case $environment in
-        dev|prod|default)
+        dev|prod)
             ;;
         *)
             print_error "Invalid environment: $environment"
@@ -210,11 +209,13 @@ main() {
     check_docker
     
     # Set compose file based on environment
-    local compose_file="docker-compose.prod.yml"
+    local compose_file="docker-compose.dev.yml"
     if [ "$environment" = "dev" ]; then
         compose_file="docker-compose.dev.yml"
     elif [ "$environment" = "prod" ]; then
         compose_file="docker-compose.prod.yml"
+    else
+        compose_file="docker-compose.dev.yml"  # default to dev
     fi
     
     print_status "Using environment: $environment"
