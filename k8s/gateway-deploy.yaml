@@ -22,7 +22,13 @@ spec:
           protocol: TCP
         env:
         - name: SPRING_PROFILES_ACTIVE
-          value: "docker"
+          value: "prod"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres-db-service:5432/foodybuddy?currentSchema=gateway"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "foodybuddy_user"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "foodybuddy_password"
         resources:
           requests:
             memory: "512Mi"
