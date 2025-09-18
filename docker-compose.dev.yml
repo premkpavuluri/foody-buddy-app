@@ -66,7 +66,7 @@ services:
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    command: ["./gradlew", "bootRun"]
+    command: ["./gradlew", "bootRun", "--args=--spring.profiles.active=docker"]
 
   foodybuddy-orders:
     build: 
@@ -78,6 +78,9 @@ services:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=orders
+      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
+      - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
     depends_on:
       - postgres
     volumes:
@@ -86,7 +89,7 @@ services:
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    command: ["./gradlew", "bootRun"]
+    command: ["./gradlew", "bootRun", "--args=--spring.profiles.active=docker"]
 
   foodybuddy-payments:
     build: 
@@ -98,6 +101,9 @@ services:
       - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=payments
+      - SPRING_DATASOURCE_USERNAME=foodybuddy_user
+      - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
     depends_on:
       - postgres
     volumes:
@@ -106,7 +112,7 @@ services:
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    command: ["./gradlew", "bootRun"]
+    command: ["./gradlew", "bootRun", "--args=--spring.profiles.active=docker"]
 
 networks:
   foodybuddy-network:
