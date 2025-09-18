@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-db-service
+  namespace: foodybuddy
   labels:
     app: postgres-database
     component: database
