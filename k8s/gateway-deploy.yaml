@@ -23,12 +23,44 @@ spec:
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: "prod"
-        - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://postgres-db-service:5432/foodybuddy?currentSchema=gateway"
-        - name: SPRING_DATASOURCE_USERNAME
+        # Database Configuration
+        - name: DB_HOST
+          value: "postgres-db-service"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "foodybuddy"
+        - name: DB_USERNAME
           value: "foodybuddy_user"
-        - name: SPRING_DATASOURCE_PASSWORD
+        - name: DB_PASSWORD
           value: "foodybuddy_password"
+        - name: DB_SCHEMA_GATEWAY
+          value: "gateway"
+        # Service URLs Configuration
+        - name: ORDERS_SERVICE_URL
+          value: "http://foodybuddy-orders:8081"
+        - name: PAYMENTS_SERVICE_URL
+          value: "http://foodybuddy-payments:8082"
+        - name: WEB_SERVICE_URL
+          value: "http://foodybuddy-web-service:3000"
+        - name: ORDERS_SERVICE_CREATE_ENDPOINT
+          value: "/api/orders"
+        - name: ORDERS_SERVICE_STATUS_ENDPOINT
+          value: "/api/orders/{orderId}/status"
+        - name: PAYMENTS_SERVICE_PROCESS_ENDPOINT
+          value: "/api/payments/process"
+        - name: PAYMENTS_SERVICE_REFUND_ENDPOINT
+          value: "/api/payments/{paymentId}/refund"
+        # JPA Configuration
+        - name: JPA_SHOW_SQL
+          value: "false"
+        - name: JPA_HIBERNATE_DDL_AUTO
+          value: "validate"
+        # Logging Configuration
+        - name: LOG_LEVEL_GATEWAY
+          value: "INFO"
+        - name: LOG_PATTERN_CONSOLE
+          value: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
         resources:
           requests:
             memory: "512Mi"

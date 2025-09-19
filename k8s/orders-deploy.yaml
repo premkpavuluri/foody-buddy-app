@@ -23,12 +23,34 @@ spec:
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: "prod"
-        - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://postgres-db-service:5432/foodybuddy?currentSchema=orders"
-        - name: SPRING_DATASOURCE_USERNAME
+        # Database Configuration
+        - name: DB_HOST
+          value: "postgres-db-service"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "foodybuddy"
+        - name: DB_USERNAME
           value: "foodybuddy_user"
-        - name: SPRING_DATASOURCE_PASSWORD
+        - name: DB_PASSWORD
           value: "foodybuddy_password"
+        - name: DB_SCHEMA_ORDERS
+          value: "orders"
+        # Service URLs Configuration
+        - name: GATEWAY_URL
+          value: "http://foodybuddy-gateway:8080"
+        # JPA Configuration
+        - name: JPA_SHOW_SQL
+          value: "false"
+        - name: JPA_HIBERNATE_DDL_AUTO
+          value: "validate"
+        - name: JPA_FORMAT_SQL
+          value: "false"
+        # Logging Configuration
+        - name: LOG_LEVEL_ORDERS
+          value: "INFO"
+        - name: LOG_PATTERN_CONSOLE
+          value: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
         resources:
           requests:
             memory: "512Mi"
