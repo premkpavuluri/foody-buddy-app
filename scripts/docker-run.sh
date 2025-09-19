@@ -209,13 +209,9 @@ main() {
     check_docker
     
     # Set compose file based on environment
-    local compose_file="docker-compose.dev.yml"
-    if [ "$environment" = "dev" ]; then
-        compose_file="docker-compose.dev.yml"
-    elif [ "$environment" = "prod" ]; then
+    local compose_file="docker-compose.dev.yml"  # default to dev
+    if [ "$environment" = "prod" ]; then
         compose_file="docker-compose.prod.yml"
-    else
-        compose_file="docker-compose.dev.yml"  # default to dev
     fi
     
     print_status "Using environment: $environment"
@@ -262,7 +258,13 @@ main() {
             ;;
         build)
             print_status "Building all images..."
-            docker-compose -f $compose_file build --no-cache
+            if [ "$force_build" = true ]; then
+                print_status "Building without cache..."
+                docker-compose -f $compose_file build --no-cache
+            else
+                print_status "Building with cache..."
+                docker-compose -f $compose_file build --no-cache
+            fi
             print_success "All images built!"
             ;;
         logs)

@@ -15,7 +15,7 @@ spec:
       protocol: TCP
     env:
     - name: SPRING_PROFILES_ACTIVE
-      value: "docker"
+      value: "prod"
     resources:
       requests:
         memory: "512Mi"
