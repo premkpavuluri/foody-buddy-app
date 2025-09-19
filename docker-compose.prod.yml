@@ -50,7 +50,8 @@ services:
     container_name: foodybuddy-gateway-prod
     ports:
       - "8080:8080"
-    # Profile is set in Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - postgres
       - foodybuddy-orders
@@ -67,7 +68,8 @@ services:
     container_name: foodybuddy-orders-prod
     ports:
       - "8081:8081"
-    # Profile is set in Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - postgres
     networks:
@@ -82,7 +84,8 @@ services:
     container_name: foodybuddy-payments-prod
     ports:
       - "8082:8082"
-    # Profile is set in Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - postgres
     networks:

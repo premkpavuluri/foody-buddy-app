@@ -54,6 +54,8 @@ services:
     container_name: foodybuddy-gateway-dev
     ports:
       - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     volumes:
       - ./foodybuddy-gateway:/app
       - /app/build
@@ -64,7 +66,6 @@ services:
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    # Profile is set in Dockerfile.dev
 
   foodybuddy-orders:
     build: 
@@ -75,6 +76,7 @@ services:
     ports:
       - "8081:8081"
     environment:
+      - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=orders
       - SPRING_DATASOURCE_USERNAME=foodybuddy_user
       - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
@@ -86,7 +88,6 @@ services:
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    # Profile is set in Dockerfile.dev
 
   foodybuddy-payments:
     build: 
@@ -97,6 +98,7 @@ services:
     ports:
       - "8082:8082"
     environment:
+      - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foodybuddy?currentSchema=payments
       - SPRING_DATASOURCE_USERNAME=foodybuddy_user
       - SPRING_DATASOURCE_PASSWORD=foodybuddy_password
@@ -108,7 +110,6 @@ services:
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    # Profile is set in Dockerfile.dev
 
 networks:
   foodybuddy-network:
