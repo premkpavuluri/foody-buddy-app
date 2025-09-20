@@ -24,6 +24,25 @@
 - [x] Service discovery setup
 - [x] Load balancer integration
 
+## Recent Kubernetes Implementation (Completed)
+- [x] **ConfigMaps Implementation**
+  - Created dedicated ConfigMaps for each service (gateway, orders, payments, web)
+  - Moved all environment variables from deployments to ConfigMaps
+  - Implemented individual key-value mapping for flexible configuration management
+  - Enabled future integration with Secrets alongside ConfigMaps
+
+- [x] **Secrets Implementation**
+  - Created shared database secret for DB_USERNAME and DB_PASSWORD
+  - Updated all backend deployments to use secretKeyRef for database credentials
+  - Removed sensitive data from ConfigMaps
+  - Implemented proper separation of sensitive data (Secrets) from configuration (ConfigMaps)
+
+- [x] **Security Enhancements**
+  - Database credentials now stored in encrypted Kubernetes Secret
+  - Centralized credential management across all services
+  - Follows Kubernetes security best practices
+  - Easy credential rotation capability
+
 ## k8s-plan
 
 ### ✅ **Your Kubernetes Plan Validation**
@@ -57,12 +76,12 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 
 #### **Phase 1: Foundation**
 ```
-⏳ Namespace
+✅ Namespace
 ✅ Basic Deployments (replace Pods)
 ✅ Services (ClusterIP + LoadBalancer)
 ✅ Labels & Selectors
-⏳ ConfigMaps
-⏳ Secrets
+✅ ConfigMaps
+✅ Secrets
 ✅ Basic Health Checks
 ```
 
@@ -72,22 +91,22 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 ✅ Readiness & Liveness Probes
 ⏳ Rolling Updates
 ✅ Resource Management
-⏳ Service Discovery
+✅ Service Discovery
 ```
 
 #### **Phase 3: Networking**
 ```
 ⏳ Ingress Controller (Nginx)
 ⏳ Network Policies
-⏳ Internal Service Communication
+✅ Internal Service Communication
 ⏳ External Traffic Management
 ```
 
 #### **Phase 4: Advanced Features**
 ```
-⏳ StatefulSets (for PostgreSQL)
+✅ StatefulSets (for PostgreSQL)
 ⏳ Service Accounts
-⏳ Cross-namespace Communication
+✅ Cross-namespace Communication
 ⏳ Node Affinity
 ⏳ Taints & Tolerations
 ```
