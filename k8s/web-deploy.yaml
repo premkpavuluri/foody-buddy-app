@@ -21,16 +21,34 @@ spec:
         - containerPort: 3000
           protocol: TCP
         env:
+        # Node.js Configuration
         - name: NODE_ENV
-          value: "production"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-web-config
+              key: NODE_ENV
         - name: PORT
-          value: "3000"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-web-config
+              key: PORT
         - name: HOSTNAME
-          value: "0.0.0.0"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-web-config
+              key: HOSTNAME
+        # API Configuration
         - name: NEXT_PUBLIC_API_BASE_URL
-          value: "http://foodybuddy-gateway-service:8080"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-web-config
+              key: NEXT_PUBLIC_API_BASE_URL
+        # Logging Configuration
         - name: NEXT_LOG_LEVEL
-          value: "info"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-web-config
+              key: NEXT_LOG_LEVEL
         resources:
           requests:
             memory: "256Mi"

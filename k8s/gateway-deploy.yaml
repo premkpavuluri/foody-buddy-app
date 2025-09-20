@@ -21,46 +21,101 @@ spec:
         - containerPort: 8080
           protocol: TCP
         env:
+        # Spring Configuration
         - name: SPRING_PROFILES_ACTIVE
-          value: "prod"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: SPRING_PROFILES_ACTIVE
         # Database Configuration
         - name: DB_HOST
-          value: "postgres-db-service"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: DB_HOST
         - name: DB_PORT
-          value: "5432"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: DB_PORT
         - name: DB_NAME
-          value: "foodybuddy"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: DB_NAME
         - name: DB_USERNAME
-          value: "foodybuddy_user"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: DB_USERNAME
         - name: DB_PASSWORD
-          value: "foodybuddy_password"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: DB_PASSWORD
         - name: DB_SCHEMA_GATEWAY
-          value: "gateway"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: DB_SCHEMA_GATEWAY
         # Service URLs Configuration
         - name: ORDERS_SERVICE_URL
-          value: "http://foodybuddy-orders:8081"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: ORDERS_SERVICE_URL
         - name: PAYMENTS_SERVICE_URL
-          value: "http://foodybuddy-payments:8082"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: PAYMENTS_SERVICE_URL
         - name: WEB_SERVICE_URL
-          value: "http://foodybuddy-web-service:3000"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: WEB_SERVICE_URL
         - name: ORDERS_SERVICE_CREATE_ENDPOINT
-          value: "/api/orders"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: ORDERS_SERVICE_CREATE_ENDPOINT
         - name: ORDERS_SERVICE_STATUS_ENDPOINT
-          value: "/api/orders/{orderId}/status"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: ORDERS_SERVICE_STATUS_ENDPOINT
         - name: PAYMENTS_SERVICE_PROCESS_ENDPOINT
-          value: "/api/payments/process"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: PAYMENTS_SERVICE_PROCESS_ENDPOINT
         - name: PAYMENTS_SERVICE_REFUND_ENDPOINT
-          value: "/api/payments/{paymentId}/refund"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: PAYMENTS_SERVICE_REFUND_ENDPOINT
         # JPA Configuration
         - name: JPA_SHOW_SQL
-          value: "false"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: JPA_SHOW_SQL
         - name: JPA_HIBERNATE_DDL_AUTO
-          value: "validate"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: JPA_HIBERNATE_DDL_AUTO
         # Logging Configuration
         - name: LOG_LEVEL_GATEWAY
-          value: "INFO"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: LOG_LEVEL_GATEWAY
         - name: LOG_PATTERN_CONSOLE
-          value: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-gateway-config
+              key: LOG_PATTERN_CONSOLE
         resources:
           requests:
             memory: "512Mi"

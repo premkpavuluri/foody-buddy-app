@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foodybuddy-web-config
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-web
+    component: config
+data:
+  # Node.js Configuration
+  NODE_ENV: "production"
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+  
+  # API Configuration
+  NEXT_PUBLIC_API_BASE_URL: "http://foodybuddy-gateway-service:8080"
+  
+  # Logging Configuration
+  NEXT_LOG_LEVEL: "info"

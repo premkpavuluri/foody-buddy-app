@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foodybuddy-gateway-config
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-gateway
+    component: config
+data:
+  # Spring Configuration
+  SPRING_PROFILES_ACTIVE: "prod"
+  
+  # Database Configuration
+  DB_HOST: "postgres-db-service"
+  DB_PORT: "5432"
+  DB_NAME: "foodybuddy"
+  DB_USERNAME: "foodybuddy_user"
+  DB_PASSWORD: "foodybuddy_password"
+  DB_SCHEMA_GATEWAY: "gateway"
+  
+  # Service URLs Configuration
+  ORDERS_SERVICE_URL: "http://foodybuddy-orders:8081"
+  PAYMENTS_SERVICE_URL: "http://foodybuddy-payments:8082"
+  WEB_SERVICE_URL: "http://foodybuddy-web-service:3000"
+  ORDERS_SERVICE_CREATE_ENDPOINT: "/api/orders"
+  ORDERS_SERVICE_STATUS_ENDPOINT: "/api/orders/{orderId}/status"
+  PAYMENTS_SERVICE_PROCESS_ENDPOINT: "/api/payments/process"
+  PAYMENTS_SERVICE_REFUND_ENDPOINT: "/api/payments/{paymentId}/refund"
+  
+  # JPA Configuration
+  JPA_SHOW_SQL: "false"
+  JPA_HIBERNATE_DDL_AUTO: "validate"
+  
+  # Logging Configuration
+  LOG_LEVEL_GATEWAY: "INFO"
+  LOG_PATTERN_CONSOLE: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

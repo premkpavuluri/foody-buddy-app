@@ -21,42 +21,91 @@ spec:
         - containerPort: 8082
           protocol: TCP
         env:
+        # Spring Configuration
         - name: SPRING_PROFILES_ACTIVE
-          value: "prod"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: SPRING_PROFILES_ACTIVE
         # Database Configuration
         - name: DB_HOST
-          value: "postgres-db-service"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: DB_HOST
         - name: DB_PORT
-          value: "5432"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: DB_PORT
         - name: DB_NAME
-          value: "foodybuddy"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: DB_NAME
         - name: DB_USERNAME
-          value: "foodybuddy_user"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: DB_USERNAME
         - name: DB_PASSWORD
-          value: "foodybuddy_password"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: DB_PASSWORD
         - name: DB_SCHEMA_PAYMENTS
-          value: "payments"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: DB_SCHEMA_PAYMENTS
         # JPA Configuration
         - name: JPA_SHOW_SQL
-          value: "false"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: JPA_SHOW_SQL
         - name: JPA_HIBERNATE_DDL_AUTO
-          value: "validate"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: JPA_HIBERNATE_DDL_AUTO
         # Payment Processing Configuration
         - name: PAYMENT_TIMEOUT
-          value: "30000"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: PAYMENT_TIMEOUT
         - name: PAYMENT_RETRY_ATTEMPTS
-          value: "3"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: PAYMENT_RETRY_ATTEMPTS
         - name: PAYMENT_SUCCESS_RATE
-          value: "0.9"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: PAYMENT_SUCCESS_RATE
         - name: PAYMENT_SIMULATION_ENABLED
-          value: "true"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: PAYMENT_SIMULATION_ENABLED
         - name: PAYMENT_PROCESSING_DELAY
-          value: "2000"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: PAYMENT_PROCESSING_DELAY
         # Logging Configuration
         - name: LOG_LEVEL_PAYMENTS
-          value: "INFO"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: LOG_LEVEL_PAYMENTS
         - name: LOG_PATTERN_CONSOLE
-          value: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-payments-config
+              key: LOG_PATTERN_CONSOLE
         resources:
           requests:
             memory: "512Mi"
