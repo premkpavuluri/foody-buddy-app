@@ -14,8 +14,6 @@ data:
   DB_HOST: "postgres-db-service"
   DB_PORT: "5432"
   DB_NAME: "foodybuddy"
-  DB_USERNAME: "foodybuddy_user"
-  DB_PASSWORD: "foodybuddy_password"
   DB_SCHEMA_ORDERS: "orders"
   
   # Service URLs Configuration

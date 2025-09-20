@@ -45,13 +45,13 @@ spec:
               key: DB_NAME
         - name: DB_USERNAME
           valueFrom:
-            configMapKeyRef:
-              name: foodybuddy-payments-config
+            secretKeyRef:
+              name: foodybuddy-database-secret
               key: DB_USERNAME
         - name: DB_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              name: foodybuddy-payments-config
+            secretKeyRef:
+              name: foodybuddy-database-secret
               key: DB_PASSWORD
         - name: DB_SCHEMA_PAYMENTS
           valueFrom:
