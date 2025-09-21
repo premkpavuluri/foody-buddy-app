@@ -137,6 +137,42 @@ cd foodybuddy-payments
 ./gradlew bootRun
 ```
 
+## 🏗️ Build Process
+
+### ⚠️ Important: Pre-build Required
+Dockerfiles expect **pre-built artifacts** for faster builds and smaller images.
+
+### Backend Services (Gateway, Orders, Payments)
+```bash
+# Build JAR artifacts first
+cd foodybuddy-gateway && ./gradlew clean build -x test
+cd foodybuddy-orders && ./gradlew clean build -x test  
+cd foodybuddy-payments && ./gradlew clean build -x test
+
+# Build Docker images
+docker build -t foodybuddy.prod.gateway:latest .
+docker build -t foodybuddy.prod.orders:latest .
+docker build -t foodybuddy.prod.payments:latest .
+```
+
+### Web Service
+```bash
+# Build Next.js application first
+cd foodybuddy-web && yarn build
+
+# Build Docker image
+docker build -t foodybuddy.prod.web:latest .
+```
+
+### Automated Build (Recommended)
+```bash
+# Build all services and Docker images
+./scripts/docker-run.sh prod build --build-services
+
+# Or just build Docker images (if artifacts exist)
+./scripts/docker-run.sh prod build
+```
+
 ## 📋 API Endpoints
 
 ### Gateway (Port 8080)

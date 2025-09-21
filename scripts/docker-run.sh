@@ -5,6 +5,9 @@
 
 set -e
 
+# Set root directory for the project
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -35,6 +38,66 @@ check_docker() {
         print_error "Docker is not running. Please start Docker and try again."
         exit 1
     fi
+}
+
+# Function to build application artifacts
+build_services() {
+    print_status "🔨 Building application artifacts..."
+    
+    # Build Gateway Service
+    print_status "Building Gateway Service..."
+    cd "$PROJECT_ROOT/foodybuddy-gateway"
+    if [ -f "gradlew" ]; then
+        ./gradlew clean build -x test
+        print_success "Gateway Service built successfully!"
+    else
+        print_error "Gradle wrapper not found in Gateway Service"
+        exit 1
+    fi
+    
+    # Build Orders Service
+    print_status "Building Orders Service..."
+    cd "$PROJECT_ROOT/foodybuddy-orders"
+    if [ -f "gradlew" ]; then
+        ./gradlew clean build -x test
+        print_success "Orders Service built successfully!"
+    else
+        print_error "Gradle wrapper not found in Orders Service"
+        exit 1
+    fi
+    
+    # Build Payments Service
+    print_status "Building Payments Service..."
+    cd "$PROJECT_ROOT/foodybuddy-payments"
+    if [ -f "gradlew" ]; then
+        ./gradlew clean build -x test
+        print_success "Payments Service built successfully!"
+    else
+        print_error "Gradle wrapper not found in Payments Service"
+        exit 1
+    fi
+    
+    # Build Web Service
+    print_status "Building Web Service..."
+    cd "$PROJECT_ROOT/foodybuddy-web"
+    if [ -f "package.json" ]; then
+        if command -v yarn >/dev/null 2>&1; then
+            yarn build
+        elif command -v npm >/dev/null 2>&1; then
+            npm run build
+        else
+            print_error "Neither yarn nor npm found. Please install Node.js package manager."
+            exit 1
+        fi
+        print_success "Web Service built successfully!"
+    else
+        print_error "package.json not found in Web Service"
+        exit 1
+    fi
+    
+    # Return to project root
+    cd "$PROJECT_ROOT"
+    print_success "🎉 All application artifacts built successfully!"
 }
 
 # Function to check if images exist
@@ -109,15 +172,19 @@ show_usage() {
     echo "OPTIONS:"
     echo "  --build - Build images when starting services"
     echo "           (Images are automatically built if missing)"
+    echo "  --build-services - Build application artifacts before building images"
+    echo "                    (Builds JARs for backend services and Next.js for web)"
     echo ""
     echo "EXAMPLES:"
-    echo "  $0 dev up         # Start development environment (build if needed)"
-    echo "  $0 dev up --build # Build and start development environment"
-    echo "  $0 prod build     # Build production images"
-    echo "  $0 down           # Stop all services"
-    echo "  $0 dev logs       # View development logs"
-    echo "  $0 prod status    # Check production status"
-    echo "  $0 clean          # Clean up everything"
+    echo "  $0 dev up                    # Start development environment (build if needed)"
+    echo "  $0 dev up --build            # Build and start development environment"
+    echo "  $0 dev up --build-services   # Build artifacts and images, then start"
+    echo "  $0 prod build                # Build production images"
+    echo "  $0 prod build --build-services # Build artifacts and production images"
+    echo "  $0 down                      # Stop all services"
+    echo "  $0 dev logs                  # View development logs"
+    echo "  $0 prod status               # Check production status"
+    echo "  $0 clean                     # Clean up everything"
     echo ""
     echo "SERVICES:"
     echo "  📦 Orders Service    - Port 8081 (Spring Boot)"
@@ -163,6 +230,7 @@ main() {
     local environment=${1:-"dev"}
     local command=${2:-"up"}
     local force_build=false
+    local build_services=false
     
     # Handle help commands
     if [[ "$environment" == "-h" || "$environment" == "--help" ]]; then
@@ -175,11 +243,12 @@ main() {
         exit 0
     fi
     
-    # Check for --build flag in any position
+    # Check for flags in any position
     for arg in "$@"; do
         if [[ "$arg" == "--build" ]]; then
             force_build=true
-            break
+        elif [[ "$arg" == "--build-services" ]]; then
+            build_services=true
         fi
     done
     
@@ -222,6 +291,11 @@ main() {
         up)
             print_status "🍕 Starting FoodyBuddy services with Docker..."
             
+            # Build services if --build-services flag is provided
+            if [ "$build_services" = true ]; then
+                build_services
+            fi
+            
             # Check if images exist or if --build flag is provided
             if [ "$force_build" = true ]; then
                 print_status "Building all images..."
@@ -257,13 +331,18 @@ main() {
             print_success "All services stopped!"
             ;;
         build)
+            # Build services if --build-services flag is provided
+            if [ "$build_services" = true ]; then
+                build_services
+            fi
+            
             print_status "Building all images..."
             if [ "$force_build" = true ]; then
                 print_status "Building without cache..."
                 docker-compose -f $compose_file build --no-cache
             else
                 print_status "Building with cache..."
-                docker-compose -f $compose_file build --no-cache
+                docker-compose -f $compose_file build
             fi
             print_success "All images built!"
             ;;
