@@ -43,6 +43,11 @@ spec:
             configMapKeyRef:
               name: foodybuddy-web-config
               key: NEXT_PUBLIC_API_BASE_URL
+        - name: GATEWAY_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-web-config
+              key: GATEWAY_BASE_URL
         # Logging Configuration
         - name: NEXT_LOG_LEVEL
           valueFrom:

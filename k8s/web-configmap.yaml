@@ -13,7 +13,8 @@ data:
   HOSTNAME: "0.0.0.0"
   
   # API Configuration
-  NEXT_PUBLIC_API_BASE_URL: "http://foodybuddy-gateway-service:8080"
+  NEXT_PUBLIC_API_BASE_URL: "http://foodybuddy-web-service:3000"
+  GATEWAY_BASE_URL: "http://foodybuddy-gateway:8080"
   
   # Logging Configuration
   NEXT_LOG_LEVEL: "info"
