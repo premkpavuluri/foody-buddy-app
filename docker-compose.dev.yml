@@ -33,19 +33,15 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+      - CONTAINER_ENV=development
       - NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
       - GATEWAY_BASE_URL=http://foodybuddy-gateway:8080
       - NEXT_LOG_LEVEL=verbose
-    volumes:
-      - ./foodybuddy-web:/app
-      - /app/node_modules
-      - /app/.next
     depends_on:
       - foodybuddy-gateway
     networks:
       - foodybuddy-network
     restart: unless-stopped
-    command: ["yarn", "dev"]
 
   foodybuddy-gateway:
     build: 
@@ -77,9 +73,6 @@ services:
       - JPA_HIBERNATE_DDL_AUTO=update
       # Logging Configuration
       - LOG_LEVEL_GATEWAY=DEBUG
-    volumes:
-      - ./foodybuddy-gateway:/app
-      - /app/build
     depends_on:
       - postgres
       - foodybuddy-orders
@@ -115,9 +108,6 @@ services:
       - LOG_LEVEL_ORDERS=DEBUG
     depends_on:
       - postgres
-    volumes:
-      - ./foodybuddy-orders:/app
-      - /app/build
     networks:
       - foodybuddy-network
     restart: unless-stopped
@@ -152,9 +142,6 @@ services:
       - LOG_LEVEL_PAYMENTS=DEBUG
     depends_on:
       - postgres
-    volumes:
-      - ./foodybuddy-payments:/app
-      - /app/build
     networks:
       - foodybuddy-network
     restart: unless-stopped

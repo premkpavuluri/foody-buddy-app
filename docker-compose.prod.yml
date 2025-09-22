@@ -55,7 +55,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       # Database Configuration
-      - DB_HOST=postgres-db-service
+      - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=foodybuddy
       - DB_USERNAME=foodybuddy_user
@@ -94,7 +94,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       # Database Configuration
-      - DB_HOST=postgres-db-service
+      - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=foodybuddy
       - DB_USERNAME=foodybuddy_user
@@ -126,7 +126,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       # Database Configuration
-      - DB_HOST=postgres-db-service
+      - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=foodybuddy
       - DB_USERNAME=foodybuddy_user
