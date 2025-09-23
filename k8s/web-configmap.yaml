@@ -16,5 +16,9 @@ data:
   NEXT_PUBLIC_API_BASE_URL: "http://foodybuddy-web-service:3000"
   GATEWAY_BASE_URL: "http://foodybuddy-gateway:8080"
   
+  # Ingress Configuration
+  INGRESS_ENABLED: "true"
+  INGRESS_HOST: "foodybuddy.local"
+  
   # Logging Configuration
   NEXT_LOG_LEVEL: "info"
