@@ -1,0 +1,56 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-database-network-policy
+  namespace: foodybuddy
+  labels:
+    app: postgres-database
+    component: database
+spec:
+  # Apply this policy to PostgreSQL pods
+  podSelector:
+    matchLabels:
+      app: postgres-database
+      component: database
+  
+  # Policy types: Ingress (incoming traffic)
+  policyTypes:
+  - Ingress
+  
+  # Ingress rules - who can access the database
+  ingress:
+  # Allow access from Gateway service
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-gateway
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Allow access from Orders service
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-orders
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Allow access from Payments service
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-payments
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Allow access from system pods (for health checks, etc.)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 5432
