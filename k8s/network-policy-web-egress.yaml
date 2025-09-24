@@ -1,0 +1,58 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-frontend-egress-policy
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-web
+    component: frontend
+spec:
+  # Apply this policy to Web frontend pods
+  podSelector:
+    matchLabels:
+      app: foodybuddy-web
+  
+  # Policy types: Egress (outgoing traffic)
+  policyTypes:
+  - Egress
+  
+  # Egress rules - what the frontend can access
+  egress:
+  # Allow access to Gateway service
+  - to:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-gateway
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Allow DNS resolution (required for service discovery)
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  
+  # Allow access to Ingress Controller (for external traffic)
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+  
+  # Allow access to system pods (for health checks, etc.)
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 10250

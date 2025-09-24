@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-ingress-policy
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-gateway
+    component: gateway
+spec:
+  # Apply this policy to Gateway pods
+  podSelector:
+    matchLabels:
+      app: foodybuddy-gateway
+  
+  # Policy types: Ingress (incoming traffic)
+  policyTypes:
+  - Ingress
+  
+  # Ingress rules - who can access the gateway
+  ingress:
+  # Allow access from Web frontend
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-web
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Allow access from Orders service (for status update callbacks)
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-orders
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Allow access from Ingress Controller (external traffic)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Allow access from system pods (for health checks, etc.)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8080

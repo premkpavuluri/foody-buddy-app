@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: orders-ingress-policy
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-orders
+    component: backend
+spec:
+  # Apply this policy to Orders pods
+  podSelector:
+    matchLabels:
+      app: foodybuddy-orders
+  
+  # Policy types: Ingress (incoming traffic)
+  policyTypes:
+  - Ingress
+  
+  # Ingress rules - who can access the orders service
+  ingress:
+  # Allow access from Gateway service only
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-gateway
+    ports:
+    - protocol: TCP
+      port: 8081
+  
+  # Allow access from system pods (for health checks, etc.)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 8081
