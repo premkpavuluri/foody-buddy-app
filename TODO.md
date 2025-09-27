@@ -70,7 +70,7 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 ```
 ✅ ReplicaSets (via Deployments)
 ✅ Readiness & Liveness Probes
-⏳ Rolling Updates
+✅ Rolling Updates
 ✅ Resource Management
 ✅ Service Discovery
 ```
