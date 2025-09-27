@@ -2,6 +2,8 @@
 
 This directory contains scripts to run all FoodyBuddy microservices locally using Gradle (for Java services) and Yarn (for the web frontend).
 
+> **📚 Main Documentation**: See [README.md](README.md) for complete project overview and quick start.
+
 ## Available Scripts
 
 ### 1. `run-services.sh`

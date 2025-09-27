@@ -2,6 +2,14 @@
 
 A comprehensive microservices application demonstrating modern architecture patterns for food delivery services. Built with Next.js frontend and Spring Boot microservices, featuring orchestrated service communication and real-time order tracking.
 
+## 📚 Documentation Index
+
+- **[🐳 Docker Setup](DOCKER_README.md)** - Complete Docker and Docker Compose guide
+- **[🛠️ Scripts Guide](SCRIPTS_README.md)** - Service runner scripts and automation
+- **[☸️ Kubernetes Setup](k8s/)** - Complete Kubernetes deployment guide
+- **[🌐 Ingress Setup](INGRESS_SETUP.md)** - NGINX Ingress configuration
+- **[📋 Project Tasks](TODO.md)** - Current development tasks and progress
+
 ## 🏗️ Architecture Overview
 
 ```
@@ -40,7 +48,7 @@ A comprehensive microservices application demonstrating modern architecture patt
 - **Port**: 8080
 
 ### **foodybuddy-orders** (Order Management)
-- **Technology**: Spring Boot, JPA, H2 Database
+- **Technology**: Spring Boot, JPA, PostgreSQL
 - **Features**:
   - Order creation and management
   - Order status tracking (PENDING → CONFIRMED → PREPARING → READY → DELIVERED)
@@ -49,7 +57,7 @@ A comprehensive microservices application demonstrating modern architecture patt
 - **Port**: 8081
 
 ### **foodybuddy-payments** (Payment Processing)
-- **Technology**: Spring Boot, JPA, H2 Database
+- **Technology**: Spring Boot, JPA, PostgreSQL
 - **Features**:
   - Payment processing and validation
   - Transaction management
@@ -94,84 +102,38 @@ CANCELLED (at any stage)
 - Node.js 18+
 - Gradle 8.5+
 
-### Running Locally
-
-1. **Start all services with Docker Compose:**
-   ```bash
-   docker-compose up --build
-   ```
-
-2. **Or use the development script:**
-   ```bash
-   ./scripts/dev.sh
-   ```
-
-3. **Access the application:**
-   - **Frontend**: http://localhost:3000
-   - **API Gateway**: http://localhost:8080
-   - **Orders Service**: http://localhost:8081
-   - **Payments Service**: http://localhost:8082
-
-## 🔧 Development
-
-### Individual Service Development
-
-Each service can be run independently:
-
+### Option 1: Docker (Recommended)
 ```bash
-# Frontend
-cd foodybuddy-web
-npm install
-npm run dev
+# Start all services with Docker Compose
+docker-compose up --build
 
-# Gateway
-cd foodybuddy-gateway
-./gradlew bootRun
-
-# Orders Service
-cd foodybuddy-orders
-./gradlew bootRun
-
-# Payments Service
-cd foodybuddy-payments
-./gradlew bootRun
+# Or use the Docker management script
+./scripts/docker-run.sh
 ```
 
-## 🏗️ Build Process
-
-### ⚠️ Important: Pre-build Required
-Dockerfiles expect **pre-built artifacts** for faster builds and smaller images.
-
-### Backend Services (Gateway, Orders, Payments)
+### Option 2: Local Development
 ```bash
-# Build JAR artifacts first
-cd foodybuddy-gateway && ./gradlew clean build -x test
-cd foodybuddy-orders && ./gradlew clean build -x test  
-cd foodybuddy-payments && ./gradlew clean build -x test
+# Run all services locally with Gradle/Yarn
+./scripts/run-services.sh
 
-# Build Docker images
-docker build -t foodybuddy.prod.gateway:latest .
-docker build -t foodybuddy.prod.orders:latest .
-docker build -t foodybuddy.prod.payments:latest .
+# Or run each service individually
+./scripts/dev-local.sh
 ```
 
-### Web Service
+### Option 3: Kubernetes
 ```bash
-# Build Next.js application first
-cd foodybuddy-web && yarn build
+# Deploy to Kubernetes
+./scripts/deploy-to-foodybuddy.sh
 
-# Build Docker image
-docker build -t foodybuddy.prod.web:latest .
+# Set up Ingress
+./scripts/deploy-ingress.sh
 ```
 
-### Automated Build (Recommended)
-```bash
-# Build all services and Docker images
-./scripts/docker-run.sh prod build --build-services
-
-# Or just build Docker images (if artifacts exist)
-./scripts/docker-run.sh prod build
-```
+### Access the Application
+- **Frontend**: http://localhost:3000
+- **API Gateway**: http://localhost:8080
+- **Orders Service**: http://localhost:8081
+- **Payments Service**: http://localhost:8082
 
 ## 📋 API Endpoints
 
@@ -200,6 +162,7 @@ docker build -t foodybuddy.prod.web:latest .
 - **🔄 Real-time Updates**: Live order status updates
 - **🏗️ Microservices**: Scalable, maintainable architecture
 - **🐳 Containerized**: Docker-ready for production deployment
+- **☸️ Kubernetes Ready**: Complete K8s deployment manifests
 - **📱 Responsive UI**: Modern, mobile-friendly interface
 
 ## 🏗️ Architecture Benefits
@@ -215,20 +178,155 @@ docker build -t foodybuddy.prod.web:latest .
 
 ```
 foody-buddy-app/
-├── foodybuddy-web/          # Next.js Frontend
-├── foodybuddy-gateway/      # Spring Boot Gateway/Orchestrator
-├── foodybuddy-orders/       # Spring Boot Orders Service
-├── foodybuddy-payments/     # Spring Boot Payments Service
-├── docker-compose.prod.yml  # Production orchestration
-├── docker-compose.dev.yml   # Development orchestration
-├── scripts/                 # All shell scripts
-│   ├── dev.sh              # Development script
-│   ├── docker-run.sh       # Docker management
-│   └── ...                 # Other scripts
+├── foodybuddy-web/              # Next.js Frontend
+├── foodybuddy-gateway/          # Spring Boot Gateway/Orchestrator
+├── foodybuddy-orders/           # Spring Boot Orders Service
+├── foodybuddy-payments/         # Spring Boot Payments Service
+├── k8s/                         # Kubernetes manifests
+│   ├── NETWORK_ARCHITECTURE.md  # Network architecture docs
+│   └── *.yaml                   # K8s deployment files
+├── scripts/                     # Automation scripts
+│   └── README.md                # Scripts documentation
+├── docker-compose.prod.yml      # Production orchestration
+├── docker-compose.dev.yml       # Development orchestration
+├── DOCKER_README.md             # Docker documentation
+├── SCRIPTS_README.md            # Scripts documentation
+├── INGRESS_SETUP.md             # Kubernetes Ingress setup
+└── TODO.md                      # Project tasks and progress
 ```
 
-Each service directory contains:
-- Source code and business logic
-- Dockerfile for containerization
-- README with service-specific documentation
-- Build configuration (Gradle/package.json)
+## 🔧 Development
+
+### Individual Service Development
+
+Each service can be run independently:
+
+```bash
+# Frontend
+cd foodybuddy-web
+npm install
+npm run dev
+
+# Gateway
+cd foodybuddy-gateway
+./gradlew bootRun
+
+# Orders Service
+cd foodybuddy-orders
+./gradlew bootRun
+
+# Payments Service
+cd foodybuddy-payments
+./gradlew bootRun
+```
+
+### Build Process
+
+#### Backend Services (Gateway, Orders, Payments)
+```bash
+# Build JAR artifacts first
+cd foodybuddy-gateway && ./gradlew clean build -x test
+cd foodybuddy-orders && ./gradlew clean build -x test  
+cd foodybuddy-payments && ./gradlew clean build -x test
+
+# Build Docker images
+docker build -t foodybuddy.prod.gateway:latest .
+docker build -t foodybuddy.prod.orders:latest .
+docker build -t foodybuddy.prod.payments:latest .
+```
+
+#### Web Service
+```bash
+# Build Next.js application first
+cd foodybuddy-web && yarn build
+
+# Build Docker image
+docker build -t foodybuddy.prod.web:latest .
+```
+
+#### Automated Build (Recommended)
+```bash
+# Build all services and Docker images
+./scripts/docker-run.sh prod build --build-services
+
+# Or just build Docker images (if artifacts exist)
+./scripts/docker-run.sh prod build
+```
+
+## 🗄️ Database
+
+The application uses PostgreSQL with schema-based separation:
+
+- **Single Database**: `foodybuddy`
+- **Schema Separation**: `gateway`, `orders`, `payments`
+- **Current Setup**: Single PostgreSQL database with schema-based separation
+
+## 🚀 Deployment Options
+
+### 1. Docker Compose
+- **Development**: `docker-compose -f docker-compose.dev.yml up`
+- **Production**: `docker-compose -f docker-compose.prod.yml up`
+- **Documentation**: [DOCKER_README.md](DOCKER_README.md)
+
+### 2. Kubernetes
+- **Deployment**: `./scripts/deploy-to-foodybuddy.sh`
+- **Ingress**: `./scripts/deploy-ingress.sh`
+- **Documentation**: [k8s/](k8s/) directory
+
+### 3. Local Development
+- **All Services**: `./scripts/run-services.sh`
+- **Individual Services**: `./scripts/dev-local.sh`
+- **Documentation**: [SCRIPTS_README.md](SCRIPTS_README.md)
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Port Conflicts
+```bash
+# Check port usage
+lsof -i :3000 :8080 :8081 :8082
+
+# Kill processes on specific ports
+lsof -ti :8080 | xargs kill -9
+```
+
+#### Service Dependencies
+Services start in this order:
+1. Orders Service (8081)
+2. Payments Service (8082)
+3. Gateway Service (8080) - waits for backend services
+4. Web Frontend (3000) - waits for gateway
+
+#### Docker Issues
+```bash
+# Clean Docker environment
+docker system prune -f
+docker-compose down --volumes
+
+# Rebuild everything
+docker-compose build --no-cache
+```
+
+#### Kubernetes Issues
+```bash
+# Check pod status
+kubectl get pods -n foodybuddy
+
+# Check service status
+kubectl get services -n foodybuddy
+
+# View logs
+kubectl logs -f deployment/foodybuddy-web -n foodybuddy
+```
+
+## 📚 Additional Resources
+
+- **[Docker Documentation](https://docs.docker.com/compose/)**
+- **[Kubernetes Documentation](https://kubernetes.io/docs/)**
+- **[Spring Boot Docker Guide](https://spring.io/guides/gs/spring-boot-docker/)**
+- **[Next.js Docker Guide](https://nextjs.org/docs/deployment#docker-image)**
+
+---
+
+**Happy Coding! 🚀**

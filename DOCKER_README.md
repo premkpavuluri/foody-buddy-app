@@ -2,6 +2,8 @@
 
 This guide covers running the FoodyBuddy microservices using Docker and Docker Compose.
 
+> **📚 Main Documentation**: See [README.md](README.md) for complete project overview and quick start.
+
 ## 🐳 Quick Start
 
 ### Using the Docker Script (Recommended)

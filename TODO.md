@@ -28,6 +28,12 @@
   - Studied Taints & Tolerations for node isolation and pod scheduling
   - Note: Not practical in local single-node setup - requires multi-node cluster
   - Concepts understood for future production deployment scenarios
+- [x] Documentation cleanup and organization
+  - Created comprehensive main README with proper linking to all docs
+  - Added cross-references between documentation files
+  - Removed duplicate content from specialized docs
+  - Deleted outdated migration documentation files
+  - Organized documentation index for easy navigation
 
 ## k8s-plan
 

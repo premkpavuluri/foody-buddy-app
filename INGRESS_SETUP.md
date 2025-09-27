@@ -1,5 +1,7 @@
 # Ingress Setup Guide
 
+> **📚 Main Documentation**: See [README.md](README.md) for complete project overview and quick start.
+
 ## Quick Start
 
 1. **Deploy Ingress Controller and Ingress:**
