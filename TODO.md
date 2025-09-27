@@ -23,6 +23,11 @@
 - [x] Docker configuration
 - [x] Service discovery setup
 - [x] Load balancer integration
+- [x] Node Affinity and Taints & Tolerations (Conceptual understanding)
+  - Studied Node Affinity for pod placement control in multi-node clusters
+  - Studied Taints & Tolerations for node isolation and pod scheduling
+  - Note: Not practical in local single-node setup - requires multi-node cluster
+  - Concepts understood for future production deployment scenarios
 
 ## k8s-plan
 
@@ -88,8 +93,8 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 ✅ StatefulSets (for PostgreSQL)
 ✅ Service Accounts
 ✅ Cross-namespace Communication
-⏳ Node Affinity
-⏳ Taints & Tolerations
+✅ Node Affinity (Info: Not practical in local single-node setup)
+✅ Taints & Tolerations (Info: Not practical in local single-node setup)
 ```
 
 #### **Phase 5: Production Ready**
