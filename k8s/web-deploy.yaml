@@ -4,7 +4,12 @@ metadata:
   name: foodybuddy-web
   namespace: foodybuddy
 spec:
-  replicas: 3
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: foodybuddy-web
