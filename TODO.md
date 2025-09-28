@@ -24,16 +24,8 @@
 - [x] Service discovery setup
 - [x] Load balancer integration
 - [x] Node Affinity and Taints & Tolerations (Conceptual understanding)
-  - Studied Node Affinity for pod placement control in multi-node clusters
-  - Studied Taints & Tolerations for node isolation and pod scheduling
-  - Note: Not practical in local single-node setup - requires multi-node cluster
-  - Concepts understood for future production deployment scenarios
 - [x] Documentation cleanup and organization
-  - Created comprehensive main README with proper linking to all docs
-  - Added cross-references between documentation files
-  - Removed duplicate content from specialized docs
-  - Deleted outdated migration documentation files
-  - Organized documentation index for easy navigation
+
 
 ## k8s-plan
 
@@ -118,9 +110,13 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
    - ⏳ For PostgreSQL data persistence
    - ⏳ For application logs
 
-2. **Horizontal Pod Autoscaler (HPA)**
-   - ⏳ Auto-scaling based on CPU/memory
-   - ⏳ Essential for production
+2. **Horizontal Pod Autoscaler (HPA)** ✅
+   - ✅ Auto-scaling based on CPU/memory
+   - ✅ Essential for production
+   - ✅ Implemented for all microservices (gateway, orders, payments, web)
+   - ✅ Configured with CPU 70% and Memory 80% thresholds
+   - ✅ Set up scaling ranges: 2-10 pods (orders/payments), 2-8 pods (web)
+   - ✅ Applied production-ready scaling behavior with 2-minute stabilization
 
 3. **Pod Disruption Budgets (PDB)**
    - ⏳ Ensure availability during updates
@@ -178,7 +174,7 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 **Medium Priority (Should Have):**
 - StatefulSets, Network Policies
 - Service Accounts, Resource Management
-- HPA, PDB
+- HPA ✅, PDB
 
 **Low Priority (Nice to Have):**
 - Advanced StatefulSets features
