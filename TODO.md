@@ -25,7 +25,8 @@
 - [x] Load balancer integration
 - [x] Node Affinity and Taints & Tolerations (Conceptual understanding)
 - [x] Documentation cleanup and organization
-
+- [x] Horizontal Pod Autoscaler (HPA) implementation
+- [x] Order Management & Cleanup CronJobs implementation
 
 ## k8s-plan
 
@@ -97,7 +98,7 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 
 #### **Phase 5: Production Ready**
 ```
-⏳ Cron Jobs
+✅ Cron Jobs
 ⏳ Init Containers
 ⏳ Multi-container Pods
 ⏳ Observability (Monitoring/Logging)
@@ -118,19 +119,28 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
    - ✅ Set up scaling ranges: 2-10 pods (orders/payments), 2-8 pods (web)
    - ✅ Applied production-ready scaling behavior with 2-minute stabilization
 
-3. **Pod Disruption Budgets (PDB)**
+3. **Cron Jobs** ✅
+   - ✅ Order Management & Cleanup Jobs implemented
+   - ✅ Stale orders cleanup (every 30 minutes)
+   - ✅ Order archival (daily at 2 AM)
+   - ✅ Database maintenance and cleanup automation
+   - ✅ Archive tables for historical data preservation
+   - ✅ Network policy updates for cronjob access
+   - ✅ Execution logging and monitoring
+
+4. **Pod Disruption Budgets (PDB)**
    - ⏳ Ensure availability during updates
    - ⏳ Critical for zero-downtime deployments
 
-4. **Service Mesh (Optional but Advanced)**
+5. **Service Mesh (Optional but Advanced)**
    - ⏳ Istio/Linkerd for advanced traffic management
    - ⏳ Circuit breakers, retries, timeouts
 
-5. **RBAC (Role-Based Access Control)**
+6. **RBAC (Role-Based Access Control)**
    - ⏳ Security for service accounts
    - ⏳ Production security requirement
 
-6. **Resource Quotas & Limit Ranges**
+7. **Resource Quotas & Limit Ranges**
    - ⏳ Namespace-level resource management
    - ⏳ Prevent resource exhaustion
 
@@ -174,7 +184,7 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 **Medium Priority (Should Have):**
 - StatefulSets, Network Policies
 - Service Accounts, Resource Management
-- HPA ✅, PDB
+- HPA ✅, Cron Jobs ✅, PDB
 
 **Low Priority (Nice to Have):**
 - Advanced StatefulSets features
