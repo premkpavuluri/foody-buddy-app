@@ -100,18 +100,11 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
 ```
 ✅ Cron Jobs
 ⏳ Init Containers
-⏳ Multi-container Pods
-⏳ Observability (Monitoring/Logging)
-⏳ Advanced StatefulSets
 ```
 
 ### **🔧 Missing Items to Consider:**
 
-1. **Persistent Volumes (PV) & Persistent Volume Claims (PVC)**
-   - ⏳ For PostgreSQL data persistence
-   - ⏳ For application logs
-
-2. **Horizontal Pod Autoscaler (HPA)** ✅
+1. **Horizontal Pod Autoscaler (HPA)** ✅
    - ✅ Auto-scaling based on CPU/memory
    - ✅ Essential for production
    - ✅ Implemented for all microservices (gateway, orders, payments, web)
@@ -119,7 +112,7 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
    - ✅ Set up scaling ranges: 2-10 pods (orders/payments), 2-8 pods (web)
    - ✅ Applied production-ready scaling behavior with 2-minute stabilization
 
-3. **Cron Jobs** ✅
+2. **Cron Jobs** ✅
    - ✅ Order Management & Cleanup Jobs implemented
    - ✅ Stale orders cleanup (every 30 minutes)
    - ✅ Order archival (daily at 2 AM)
@@ -128,21 +121,48 @@ Your plan is **excellent and well-structured**! It covers all the essential Kube
    - ✅ Network policy updates for cronjob access
    - ✅ Execution logging and monitoring
 
-4. **Pod Disruption Budgets (PDB)**
+3. **Init Containers**
+   - ⏳ Database schema validation before service startup
+   - ⏳ Service dependency health checks
+   - ⏳ Configuration validation
+   - ⏳ Data seeding and test data setup
+
+4. **Multi-container Pods**
+   - ⏳ Sidecar containers for logging
+   - ⏳ Sidecar containers for monitoring
+   - ⏳ Shared volumes between containers
+
+5. **Observability (Monitoring/Logging)**
+   - ⏳ ELK Stack (Elasticsearch, Logstash, Kibana)
+   - ⏳ Prometheus and Grafana for metrics
+   - ⏳ Application performance monitoring
+   - ⏳ Centralized logging aggregation
+
+6. **Advanced StatefulSets**
+   - ⏳ StatefulSet for PostgreSQL with persistent volumes
+   - ⏳ Ordered pod management
+   - ⏳ Stable network identities
+
+7. **Persistent Volumes (PV) & Persistent Volume Claims (PVC)**
+   - ⏳ For PostgreSQL data persistence
+   - ⏳ For application logs
+   - ⏳ For Elasticsearch data storage
+
+8. **Pod Disruption Budgets (PDB)**
    - ⏳ Ensure availability during updates
    - ⏳ Critical for zero-downtime deployments
 
-5. **Service Mesh (Optional but Advanced)**
+9. **Service Mesh (Optional but Advanced)**
    - ⏳ Istio/Linkerd for advanced traffic management
    - ⏳ Circuit breakers, retries, timeouts
 
-6. **RBAC (Role-Based Access Control)**
-   - ⏳ Security for service accounts
-   - ⏳ Production security requirement
+10. **RBAC (Role-Based Access Control)**
+    - ⏳ Security for service accounts
+    - ⏳ Production security requirement
 
-7. **Resource Quotas & Limit Ranges**
-   - ⏳ Namespace-level resource management
-   - ⏳ Prevent resource exhaustion
+11. **Resource Quotas & Limit Ranges**
+    - ⏳ Namespace-level resource management
+    - ⏳ Prevent resource exhaustion
 
 ### **💡 Specific Recommendations:**
 
