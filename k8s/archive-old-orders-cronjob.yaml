@@ -1,0 +1,156 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: archive-old-orders
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-cronjob
+    component: order-archival
+    purpose: maintenance
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  concurrencyPolicy: Forbid  # Prevent overlapping executions
+  successfulJobsHistoryLimit: 7  # Keep 1 week of successful job history
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: foodybuddy-cronjob
+            component: order-archival
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: archive-orders
+            image: postgres:15
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: foodybuddy-database-secret
+                  key: DB_PASSWORD
+            - name: PGHOST
+              value: "postgres-database-0.postgres-db-service.foodybuddy.svc.cluster.local"
+            - name: PGPORT
+              value: "5432"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: foodybuddy-database-secret
+                  key: DB_USERNAME
+            - name: PGDATABASE
+              value: "foodybuddy"
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              echo "Starting order archival process at $(date)"
+              
+              # Create archive tables if they don't exist
+              echo "Creating archive tables if needed..."
+              psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                CREATE TABLE IF NOT EXISTS orders.orders_archive (LIKE orders.orders INCLUDING ALL);
+                CREATE TABLE IF NOT EXISTS orders.order_items_archive (LIKE orders.order_items INCLUDING ALL);
+                CREATE TABLE IF NOT EXISTS gateway.gateway_orders_archive (LIKE gateway.gateway_orders INCLUDING ALL);
+                CREATE TABLE IF NOT EXISTS payments.payments_archive (LIKE payments.payments INCLUDING ALL);
+              "
+              
+              # Count orders to be archived
+              echo "Counting orders to be archived..."
+              ORDERS_TO_ARCHIVE=$(psql -h $PGHOST -U $PGUSER -d $PGDATABASE -t -c "
+                SELECT COUNT(*) 
+                FROM orders.orders 
+                WHERE status IN ('DELIVERED', 'CANCELLED') 
+                AND created_at < NOW() - INTERVAL '90 days';
+              ")
+              echo "Found $ORDERS_TO_ARCHIVE orders to archive"
+              
+              if [ "$ORDERS_TO_ARCHIVE" -gt 0 ]; then
+                # Archive orders
+                echo "Archiving orders..."
+                psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                  INSERT INTO orders.orders_archive 
+                  SELECT * FROM orders.orders 
+                  WHERE status IN ('DELIVERED', 'CANCELLED') 
+                  AND created_at < NOW() - INTERVAL '90 days';
+                "
+                
+                # Archive order items
+                echo "Archiving order items..."
+                psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                  INSERT INTO orders.order_items_archive 
+                  SELECT oi.* FROM orders.order_items oi
+                  INNER JOIN orders.orders o ON oi.order_id = o.id
+                  WHERE o.status IN ('DELIVERED', 'CANCELLED') 
+                  AND o.created_at < NOW() - INTERVAL '90 days';
+                "
+                
+                # Archive gateway orders
+                echo "Archiving gateway orders..."
+                psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                  INSERT INTO gateway.gateway_orders_archive 
+                  SELECT go.* FROM gateway.gateway_orders go
+                  INNER JOIN orders.orders o ON go.order_id = o.order_id
+                  WHERE o.status IN ('DELIVERED', 'CANCELLED') 
+                  AND o.created_at < NOW() - INTERVAL '90 days';
+                "
+                
+                # Archive payments
+                echo "Archiving payments..."
+                psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                  INSERT INTO payments.payments_archive 
+                  SELECT p.* FROM payments.payments p
+                  INNER JOIN orders.orders o ON p.order_id = o.order_id
+                  WHERE o.status IN ('DELIVERED', 'CANCELLED') 
+                  AND o.created_at < NOW() - INTERVAL '90 days';
+                "
+                
+                # Delete archived records from main tables
+                echo "Deleting archived records from main tables..."
+                psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                  DELETE FROM orders.order_items 
+                  WHERE order_id IN (
+                    SELECT id FROM orders.orders 
+                    WHERE status IN ('DELIVERED', 'CANCELLED') 
+                    AND created_at < NOW() - INTERVAL '90 days'
+                  );
+                  
+                  DELETE FROM orders.orders 
+                  WHERE status IN ('DELIVERED', 'CANCELLED') 
+                  AND created_at < NOW() - INTERVAL '90 days';
+                  
+                  DELETE FROM gateway.gateway_orders 
+                  WHERE order_id IN (
+                    SELECT order_id FROM orders.orders_archive 
+                    WHERE created_at < NOW() - INTERVAL '90 days'
+                  );
+                  
+                  DELETE FROM payments.payments 
+                  WHERE order_id IN (
+                    SELECT order_id FROM orders.orders_archive 
+                    WHERE created_at < NOW() - INTERVAL '90 days'
+                  );
+                "
+                
+                echo "Order archival completed successfully"
+              else
+                echo "No orders found to archive"
+              fi
+              
+              # Log archival statistics
+              psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c "
+                INSERT INTO gateway.cleanup_logs (job_type, records_processed, execution_time, status)
+                VALUES ('order_archival', $ORDERS_TO_ARCHIVE, NOW(), 'SUCCESS')
+                ON CONFLICT DO NOTHING;
+              " || echo "Note: cleanup_logs table may not exist yet"
+              
+              echo "Order archival process completed at $(date)"
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "200m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"

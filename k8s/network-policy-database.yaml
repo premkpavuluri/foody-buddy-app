@@ -46,6 +46,15 @@ spec:
     - protocol: TCP
       port: 5432
   
+  # Allow access from CronJob pods (for maintenance tasks)
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-cronjob
+    ports:
+    - protocol: TCP
+      port: 5432
+  
   # Allow access from system pods (for health checks, etc.)
   - from:
     - namespaceSelector:
