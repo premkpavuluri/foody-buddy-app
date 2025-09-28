@@ -18,6 +18,78 @@ spec:
       labels:
         app: foodybuddy-orders
     spec:
+      initContainers:
+      - name: db-schema-validator
+        image: postgres:15
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: foodybuddy-database-secret
+              key: DB_PASSWORD
+        - name: PGHOST
+          value: "postgres-database-0.postgres-db-service.foodybuddy.svc.cluster.local"
+        - name: PGPORT
+          value: "5432"
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: foodybuddy-database-secret
+              key: DB_USERNAME
+        - name: PGDATABASE
+          value: "foodybuddy"
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          echo "🔍 Validating database schema for Orders service..."
+          
+          # Wait for database to be ready
+          until pg_isready -h $PGHOST -U $PGUSER; do
+            echo "⏳ Waiting for database to be ready..."
+            sleep 2
+          done
+          
+          # Validate orders schema exists
+          SCHEMA_EXISTS=$(psql -h $PGHOST -U $PGUSER -d $PGDATABASE -t -c "
+            SELECT CASE 
+              WHEN EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'orders') 
+              THEN 'EXISTS' 
+              ELSE 'MISSING' 
+            END;
+          " | tr -d ' \n\r')
+          
+          echo "Schema validation result: '$SCHEMA_EXISTS'"
+          
+          if [ "$SCHEMA_EXISTS" != "EXISTS" ]; then
+            echo "❌ Orders schema validation failed. Schema 'orders' not found."
+            exit 1
+          fi
+          
+          # Validate critical tables exist
+          TABLE_COUNT=$(psql -h $PGHOST -U $PGUSER -d $PGDATABASE -t -c "
+            SELECT COUNT(*) 
+            FROM information_schema.tables 
+            WHERE table_schema = 'orders'
+            AND table_name IN ('orders', 'order_items');
+          " | tr -d ' \n\r')
+          
+          echo "Table count result: '$TABLE_COUNT'"
+          
+          if [ "$TABLE_COUNT" -lt 2 ]; then
+            echo "❌ Critical tables validation failed. Expected 2 tables in orders schema, found $TABLE_COUNT"
+            exit 1
+          fi
+          
+          echo "✅ Database schema validation passed for Orders service!"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
       containers:
       - name: foodybuddy-orders
         image: foodybuddy.prod.orders:latest
