@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foodybuddy-database-config
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy
+    component: database
+    type: config
+data:
+  # Database Configuration
+  DB_NAME: "foodybuddy"
+  DB_PORT: "5432"
+  DB_HOST: "postgres-db-service"

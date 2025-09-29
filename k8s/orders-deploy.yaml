@@ -37,7 +37,10 @@ spec:
               name: foodybuddy-database-secret
               key: DB_USERNAME
         - name: PGDATABASE
-          value: "foodybuddy"
+          valueFrom:
+            configMapKeyRef:
+              name: foodybuddy-orders-config
+              key: DB_NAME
         command:
         - /bin/bash
         - -c
