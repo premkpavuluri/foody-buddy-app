@@ -100,6 +100,47 @@ build_services() {
     print_success "🎉 All application artifacts built successfully!"
 }
 
+# Function to pull and tag postgres image
+pull_postgres_image() {
+    local environment=$1
+    local postgres_source="postgres:15"
+    local postgres_target=""
+    
+    # Set target image name based on environment
+    if [ "$environment" = "prod" ]; then
+        postgres_target="foodybuddy.prod.postgres:latest"
+    else
+        postgres_target="postgres:15"
+    fi
+    
+    print_status "Checking for PostgreSQL image..."
+    
+    # Check if target postgres image exists
+    if ! docker image inspect "$postgres_target" > /dev/null 2>&1; then
+        print_status "PostgreSQL image not found. Pulling and tagging..."
+        
+        # Pull the source image
+        if docker pull "$postgres_source"; then
+            print_success "PostgreSQL source image pulled successfully!"
+            
+            # Tag for production environment
+            if [ "$environment" = "prod" ]; then
+                if docker tag "$postgres_source" "$postgres_target"; then
+                    print_success "PostgreSQL image tagged as $postgres_target"
+                else
+                    print_error "Failed to tag PostgreSQL image"
+                    exit 1
+                fi
+            fi
+        else
+            print_error "Failed to pull PostgreSQL image"
+            exit 1
+        fi
+    else
+        print_status "PostgreSQL image already exists"
+    fi
+}
+
 # Function to check if images exist
 check_images_exist() {
     local compose_file=$1
@@ -110,8 +151,19 @@ check_images_exist() {
     local services=$(docker-compose -f $compose_file config --services 2>/dev/null)
     
     for service in $services; do
-        # Skip postgres as it uses a public image
+        # Handle postgres separately
         if [ "$service" = "postgres" ]; then
+            # Check for environment-specific postgres image
+            local postgres_image=""
+            if [ "$environment" = "prod" ]; then
+                postgres_image="foodybuddy.prod.postgres:latest"
+            else
+                postgres_image="postgres:15"
+            fi
+            
+            if ! docker image inspect "$postgres_image" > /dev/null 2>&1; then
+                missing_images+=("$service")
+            fi
             continue
         fi
         
@@ -305,8 +357,22 @@ main() {
                 local missing_images=($(check_images_exist $compose_file $environment))
                 if [ ${#missing_images[@]} -gt 0 ]; then
                     print_warning "Missing images detected: ${missing_images[*]}"
-                    print_status "Building missing images..."
-                    docker-compose -f $compose_file build
+                    
+                    # Check if postgres is missing and pull it
+                    for missing_image in "${missing_images[@]}"; do
+                        if [ "$missing_image" = "postgres" ]; then
+                            pull_postgres_image $environment
+                            # Remove postgres from missing images array
+                            missing_images=($(printf '%s\n' "${missing_images[@]}" | grep -v "^postgres$"))
+                            break
+                        fi
+                    done
+                    
+                    # Build remaining missing images if any
+                    if [ ${#missing_images[@]} -gt 0 ]; then
+                        print_status "Building remaining missing images..."
+                        docker-compose -f $compose_file build
+                    fi
                 else
                     print_status "All images found, starting services..."
                 fi
