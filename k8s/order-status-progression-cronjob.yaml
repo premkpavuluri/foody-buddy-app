@@ -1,0 +1,89 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: order-status-progression
+  namespace: foodybuddy
+  labels:
+    app: foodybuddy-cronjob
+    component: order-progression
+    purpose: automation
+spec:
+  schedule: "*/30 * * * *"  # Every 30 minutes
+  concurrencyPolicy: Forbid  # Prevent overlapping executions
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: foodybuddy-cronjob
+            component: order-progression
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: order-progression
+            image: curlimages/curl:latest
+            env:
+            - name: ORDERS_URL
+              value: "http://foodybuddy-orders:8081"
+            command:
+            - /bin/sh
+            - -c
+            - |
+              #!/bin/sh
+              set -e
+              
+              # Configuration
+              ORDERS_ENDPOINT="$ORDERS_URL/api/orders/bulk-status-update"
+              TIMEOUT=30
+              
+              # Logging function
+              log() {
+                echo "[$(date '+%Y-%m-%d %H:%M:%S UTC')] $1"
+              }
+              
+              # Error handling function
+              handle_error() {
+                log "❌ ERROR: $1"
+                exit 1
+              }
+              
+              # Main execution
+              log "🚀 Starting order status progression job"
+              log "📡 Calling Orders service: $ORDERS_ENDPOINT"
+              
+              # Make the API call with timeout
+              response=$(curl -s --max-time $TIMEOUT -X POST "$ORDERS_ENDPOINT" \
+                -H "Content-Type: application/json" \
+                -H "User-Agent: foodybuddy-cronjob/1.0" \
+                -w "HTTPSTATUS:%{http_code}" || handle_error "Failed to connect to Orders service")
+              
+              # Parse response
+              http_code=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+              body=$(echo "$response" | sed -e 's/HTTPSTATUS:.*//g')
+              
+              # Process response
+              if [ "$http_code" -eq 200 ]; then
+                log "✅ Order status progression completed successfully"
+                log "📊 Response: $body"
+                
+                # Extract and log key metrics if available
+                if echo "$body" | grep -q "totalOrdersUpdated"; then
+                  updated_count=$(echo "$body" | grep -o '"totalOrdersUpdated":[0-9]*' | cut -d':' -f2)
+                  log "📈 Orders updated: $updated_count"
+                fi
+              else
+                log "❌ Order status progression failed with HTTP $http_code"
+                log "📄 Error response: $body"
+                exit 1
+              fi
+              
+              log "🏁 Order status progression job completed successfully"
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "50m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"

@@ -18,11 +18,20 @@ spec:
   
   # Ingress rules - who can access the orders service
   ingress:
-  # Allow access from Gateway service only
+  # Allow access from Gateway service
   - from:
     - podSelector:
         matchLabels:
           app: foodybuddy-gateway
+    ports:
+    - protocol: TCP
+      port: 8081
+  
+  # Allow access from Cron Job pods (for order status progression)
+  - from:
+    - podSelector:
+        matchLabels:
+          app: foodybuddy-cronjob
     ports:
     - protocol: TCP
       port: 8081
