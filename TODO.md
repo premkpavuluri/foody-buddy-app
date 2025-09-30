@@ -1,13 +1,6 @@
 # TODO
 
 ## In Progress
-- [ ] Add proper loggers and its formats
-  - Configure logging levels (INFO, DEBUG, ERROR)
-  - Set up structured logging format
-  - Add request/response logging
-  - Configure log rotation and retention policies
-  - Add correlation IDs for request tracing
-
 - [ ] Implement profile section
   - Create profile data model
   - Add profile REST endpoints
@@ -27,6 +20,11 @@
 - [x] Documentation cleanup and organization
 - [x] Horizontal Pod Autoscaler (HPA) implementation
 - [x] Order Management & Cleanup CronJobs implementation
+- [x] Add proper loggers and its formats
+  - [x] Configure logging levels (INFO, DEBUG, ERROR) - All services configured with environment-based log levels
+  - [x] Set up structured logging format - Consistent timestamp and level formatting across all services
+  - [x] Configure log rotation and retention policies - 10MB max size, 30 days retention configured
+  - [x] Comprehensive application logging - Extensive logging implemented in all controllers and services
 
 ## k8s-plan
 
