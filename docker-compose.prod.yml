@@ -74,7 +74,9 @@ services:
       - JPA_HIBERNATE_DDL_AUTO=validate
       # Logging Configuration
       - LOG_LEVEL_GATEWAY=INFO
-      - LOG_PATTERN_CONSOLE=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+      - LOG_PATTERN_CONSOLE=%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+    volumes:
+      - ./logs:/app/logs
     depends_on:
       - postgres
       - foodybuddy-orders
@@ -108,7 +110,9 @@ services:
       - JPA_FORMAT_SQL=false
       # Logging Configuration
       - LOG_LEVEL_ORDERS=INFO
-      - LOG_PATTERN_CONSOLE=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+      - LOG_PATTERN_CONSOLE=%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+    volumes:
+      - ./logs:/app/logs
     depends_on:
       - postgres
     networks:
@@ -143,7 +147,9 @@ services:
       - PAYMENT_PROCESSING_DELAY=2000
       # Logging Configuration
       - LOG_LEVEL_PAYMENTS=INFO
-      - LOG_PATTERN_CONSOLE=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+      - LOG_PATTERN_CONSOLE=%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+    volumes:
+      - ./logs:/app/logs
     depends_on:
       - postgres
     networks:

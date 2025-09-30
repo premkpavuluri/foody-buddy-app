@@ -29,4 +29,8 @@ data:
   
   # Logging Configuration
   LOG_LEVEL_PAYMENTS: "INFO"
-  LOG_PATTERN_CONSOLE: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  LOG_PATTERN_CONSOLE: "%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"
+  LOG_PATTERN_FILE: "%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"
+  LOG_FILE_NAME: "logs/payments.log"
+  LOG_FILE_MAX_SIZE: "10MB"
+  LOG_FILE_MAX_HISTORY: "30"
