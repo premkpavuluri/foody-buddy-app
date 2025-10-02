@@ -2,11 +2,41 @@
 
 A comprehensive microservices application demonstrating modern architecture patterns for food delivery services. Built with Next.js frontend and Spring Boot microservices, featuring orchestrated service communication and real-time order tracking.
 
+## 🎯 Goal
+
+To master Kubernetes through hands-on experience, I architected and built this production-grade microservices application from scratch using AI assistance. This project showcases real-world multi-service architecture patterns with comprehensive Kubernetes deployment strategies, demonstrating enterprise-level container orchestration practices in action.
+
+## 📥 Setup & Clone
+
+To get started with FoodyBuddy, clone all microservices into this main project folder. Each service is maintained in its own repository for better modularity and independent development.
+
+### Clone All Services:
+
+```bash
+# Clone the main project repository (this one)
+git clone https://github.com/premkpavuluri/foody-buddy-app.git
+cd foody-buddy-app
+
+# Clone all microservices into their respective folders
+git clone https://github.com/premkpavuluri/foodybuddy-web.git
+git clone https://github.com/premkpavuluri/foodybuddy-gateway.git
+git clone https://github.com/premkpavuluri/foodybuddy-orders.git
+git clone https://github.com/premkpavuluri/foodybuddy-payments.git
+```
+
+### Repository Links:
+- **🌐 [FoodyBuddy Web](https://github.com/premkpavuluri/foodybuddy-web)** - Next.js Frontend
+- **🚪 [FoodyBuddy Gateway](https://github.com/premkpavuluri/foodybuddy-gateway)** - API Gateway & Orchestrator
+- **📦 [FoodyBuddy Orders](https://github.com/premkpavuluri/foodybuddy-orders)** - Order Management Service
+- **💳 [FoodyBuddy Payments](https://github.com/premkpavuluri/foodybuddy-payments)** - Payment Processing Service
+
+> **Note**: Ensure all services are cloned into the main `foody-buddy-app` directory to maintain the correct project structure for Docker Compose and Kubernetes deployments.
+
 ## 📚 Documentation Index
 
 - **[🐳 Docker Setup](DOCKER_README.md)** - Complete Docker and Docker Compose guide
 - **[🛠️ Scripts Guide](SCRIPTS_README.md)** - Service runner scripts and automation
-- **[☸️ Kubernetes Setup](k8s/)** - Complete Kubernetes deployment guide
+- **[☸️ Kubernetes Setup](k8s/NETWORK_ARCHITECTURE.md)** - Complete Kubernetes deployment guide
 - **[🌐 Ingress Setup](INGRESS_SETUP.md)** - NGINX Ingress configuration
 - **[📋 Project Tasks](TODO.md)** - Current development tasks and progress
 
