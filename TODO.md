@@ -1,6 +1,7 @@
 # TODO
 
 ## In Progress
+- [ ] Update README to have web site preview (image)
 - [ ] Implement profile section
   - Create profile data model
   - Add profile REST endpoints
